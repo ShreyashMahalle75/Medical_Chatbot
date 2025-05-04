@@ -8,10 +8,14 @@ from langchain_huggingface import HuggingFaceEmbeddings  # Updated import
 import os
 import logging
 import pickle
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.secret_key = 'supersecretkey'
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'supersecretkey')  # Use environment variable for secret key
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Configure logging
@@ -20,7 +24,9 @@ logger = logging.getLogger(__name__)
 
 # Configure Generative AI model
 model = genai.GenerativeModel('gemini-2.0-flash-exp')
-my_api_key_gemini = os.getenv('AIzaSyDjn79AMW-V9C2nPUyALtNFlgK6OJfIZJI')
+my_api_key_gemini = os.getenv('GOOGLE_API_KEY')  # Get API key from environment variable
+if not my_api_key_gemini:
+    raise ValueError("GOOGLE_API_KEY environment variable is not set")
 genai.configure(api_key=my_api_key_gemini)
 
 # Global variable to store the vector store
